@@ -3,65 +3,48 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
+$rootUser = "root";
+$rootPassword = "mon_vrai_mdp";
+$appUser = "appuser";
+$appPassword = "monmdp";
+$sqlFile = "db.sql";
 
 try {
-    $db = new PDO("mysql:host=localhost;dbname=travel_db;charset=utf8", "appuser", "monmdp");
-    $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    // 1️⃣ Essayer de se connecter avec appuser
+    try {
+        $db = new PDO("mysql:host=localhost;dbname=travel_db;charset=utf8", $appUser, $appPassword);
+        $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        // La base existe déjà
+    } catch (PDOException $e) {
+        // La base n'existe pas → créer avec root
+        $rootPdo = new PDO("mysql:host=localhost;charset=utf8", $rootUser, $rootPassword);
+        $rootPdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    // === Création automatique des tables si elles n'existent pas ===
-    $db->exec("
-    CREATE TABLE IF NOT EXISTS CLIENT (
-        ID_CLIENT INT AUTO_INCREMENT PRIMARY KEY,
-        NOM_CLI VARCHAR(255) NOT NULL,
-        PRENOM_CLI VARCHAR(255) NOT NULL,
-        EMAIL_CLI VARCHAR(255) NOT NULL UNIQUE,
-        MDP_CLI VARCHAR(255) NOT NULL,
-        TEL_CLI VARCHAR(50) NOT NULL,
-        STATUT_CLI ENUM('normal','admin','inactif','partenaire') NOT NULL DEFAULT 'normal',
-        PHOTO_PROFILE VARCHAR(255) NOT NULL DEFAULT './photos/profilpic/profiledefault.jpg'
-    );");
+        // Créer l'utilisateur si nécessaire
+        $rootPdo->exec("CREATE USER IF NOT EXISTS '$appUser'@'localhost' IDENTIFIED WITH mysql_native_password BY '$appPassword';");
+        $rootPdo->exec("GRANT ALL PRIVILEGES ON travel_db.* TO '$appUser'@'localhost';");
+        $rootPdo->exec("FLUSH PRIVILEGES;");
 
-    $db->exec("
-    CREATE TABLE IF NOT EXISTS ACTIVITE (
-        ID_ACTIVITE INT AUTO_INCREMENT PRIMARY KEY,
-        NOM_ACT VARCHAR(255) NOT NULL,
-        DESCRIPTION_ACT TEXT,
-        LIEU_ACT VARCHAR(255) NOT NULL,
-        DATE_DEBUT_ACT DATE NOT NULL,
-        DATE_FIN_ACT DATE,
-        ID_CLIENT_ORGANISATEUR INT NOT NULL,
-        FOREIGN KEY (ID_CLIENT_ORGANISATEUR) REFERENCES CLIENT(ID_CLIENT)
-            ON DELETE CASCADE ON UPDATE CASCADE
-    );");
+        // Créer la base de données
+        $rootPdo->exec("CREATE DATABASE IF NOT EXISTS travel_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;");
 
-    $db->exec("
-    CREATE TABLE IF NOT EXISTS EVENEMENT (
-        ID_EVENEMENT INT AUTO_INCREMENT PRIMARY KEY,
-        NOM_EVT VARCHAR(255) NOT NULL,
-        DESCRIPTION_EVT TEXT,
-        LIEU_EVT VARCHAR(255) NOT NULL,
-        DATE_DEBUT_EVT DATE NOT NULL,
-        DATE_FIN_EVT DATE,
-        ID_CLIENT_ORGANISATEUR INT NOT NULL,
-        FOREIGN KEY (ID_CLIENT_ORGANISATEUR) REFERENCES CLIENT(ID_CLIENT)
-            ON DELETE CASCADE ON UPDATE CASCADE
-    );");
+        // Lire et exécuter db.sql
+        if (!file_exists($sqlFile)) throw new Exception("Fichier $sqlFile introuvable !");
+        $sql = file_get_contents($sqlFile);
 
-    $db->exec("
-    CREATE TABLE IF NOT EXISTS PARTICIPATION (
-    ID_PARTICIPATION INT AUTO_INCREMENT PRIMARY KEY,
-    ID_CLIENT INT NOT NULL,
-    ID_ACTIVITE INT,
-    ID_EVENEMENT INT,
-    DATE_PARTICIPATION DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (ID_CLIENT) REFERENCES CLIENT(ID_CLIENT)
-        ON DELETE CASCADE ON UPDATE CASCADE,
-    FOREIGN KEY (ID_ACTIVITE) REFERENCES ACTIVITE(ID_ACTIVITE)
-        ON DELETE CASCADE ON UPDATE CASCADE,
-    FOREIGN KEY (ID_EVENEMENT) REFERENCES EVENEMENT(ID_EVENEMENT)
-        ON DELETE CASCADE ON UPDATE CASCADE
-);");
+        $rootPdo->exec("USE travel_db;");
+        $rootPdo->exec("SET FOREIGN_KEY_CHECKS = 0;");
+        $rootPdo->exec($sql);
+        $rootPdo->exec("SET FOREIGN_KEY_CHECKS = 1;");
 
-} catch(PDOException $e) {
-    die("Erreur connexion ou création des tables : " . $e->getMessage());
+        // Reconnecter avec appuser
+        $db = new PDO("mysql:host=localhost;dbname=travel_db;charset=utf8", $appUser, $appPassword);
+        $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    }
+
+
+} catch (PDOException $e) {
+    die("Erreur PDO : " . $e->getMessage());
+} catch (Exception $e) {
+    die("Erreur : " . $e->getMessage());
 }

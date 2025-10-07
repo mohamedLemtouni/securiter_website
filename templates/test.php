@@ -1,6 +1,13 @@
-<?php
-$db = new PDO("sqlite:" . __DIR__ . "/db.sqlite");
-$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
 
-$tables = $db->query("SELECT name FROM sqlite_master WHERE type='table'")->fetchAll(PDO::FETCH_COLUMN);
-print_r($tables);
+<img src="./photos/profilpic/default-profile-account-unknown-icon-black-silhouette-free-vector.jpg" alt="">
+    
+</body>
+</html>
