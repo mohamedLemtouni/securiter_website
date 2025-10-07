@@ -1,0 +1,143 @@
+    @font-face {
+    font-family: Poppins-Regular;
+    src: url(../fonts/poppins/Poppins-Regular.ttf)
+}
+
+@font-face {
+    font-family: Poppins-Medium;
+    src: url(../fonts/poppins/Poppins-Medium.ttf)
+}
+
+@font-face {
+    font-family: Poppins-Bold;
+    src: url(../fonts/poppins/Poppins-Bold.ttf)
+}
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background: url('https://www.travel-magical-morocco.com/wp-content/uploads/2021/11/medina-marrakech-square-morocco-1024x683.jpg') no-repeat center center/cover;
+      background-attachment: fixed;
+      color: #fff;
+      line-height: 1.6;
+    }
+
+    .hero {
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      text-align: center;
+      padding: 0 20px;
+    }
+
+    .hero h1 {
+      font-size: 70px;
+      font-weight: bold;
+      letter-spacing: 2px;
+    }
+
+    .hero p {
+      margin: 20px 0;
+      font-size: 18px;
+    }
+
+    .hero button {
+      padding: 10px 25px;
+      border: none;
+      background: #ff4500;
+      color: #fff;
+      cursor: pointer;
+      font-size: 16px;
+      border-radius: 4px;
+      transition: 0.3s;
+    }
+
+    .hero button:hover {
+      background: #e03e00;
+    }
+
+    /* Popular Tours */
+    .tours {
+      padding: 80px 50px;
+      text-align: center;
+      background: #111;
+    }
+
+    .tours h2 {
+      font-size: 26px;
+      margin-bottom: 40px;
+    }
+
+    .tour-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background: #1a1a1a;
+      border-radius: 10px;
+      overflow: hidden;
+      transition: transform 0.3s;
+    }
+
+    .card:hover {
+      transform: translateY(-10px);
+    }
+
+    .card img {
+      width: 100%;
+      height: 85%;
+      object-fit: cover;
+    }
+
+    .card h3 {
+      padding: 15px;
+      font-size: 18px;
+    }
+
+    .video-section {
+      padding: 80px 50px;
+      text-align: center;
+    }
+
+    .video-section h2 {
+      font-size: 30px;
+      margin-bottom: 20px;
+    }
+
+    .video-thumbnails {
+      display: flex;
+      justify-content: space-around;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .video-thumbnails img {
+      width: 30%;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: transform 0.3s;
+    }
+
+    .video-thumbnails img:hover {
+      transform: scale(1.05);
+    }
+
+
+
+    @media (max-width: 768px) {
+      .hero h1 {
+        font-size: 50px;
+      }
+      .video-thumbnails img {
+        width: 100%;
+        max-width: 400px;
+      }
+    }
