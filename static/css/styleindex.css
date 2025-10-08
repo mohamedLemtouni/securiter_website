@@ -12,12 +12,7 @@
     font-family: Poppins-Bold;
     src: url(../fonts/poppins/Poppins-Bold.ttf)
 }
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Poppins', sans-serif;
-    }
+
 
     body {
       background: url('https://www.travel-magical-morocco.com/wp-content/uploads/2021/11/medina-marrakech-square-morocco-1024x683.jpg') no-repeat center center/cover;

@@ -1,0 +1,84 @@
+/* =============================
+   Mise en page principale
+============================= */
+.event-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 25px;
+    padding: 50px 20px;
+    min-height: 300px;
+    background-color: #fafafa;
+}
+
+/* =============================
+   Carte d'événement
+============================= */
+.event-card {
+    background: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    width: 280px;
+    padding: 25px;
+    text-align: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.event-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+}
+
+/* =============================
+   Titre & Description
+============================= */
+.event-title {
+    font-size: 1.4em;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.event-description {
+    font-size: 0.95em;
+    color: #555;
+    line-height: 1.5;
+    margin-bottom: 20px;
+}
+
+/* =============================
+   Bouton
+============================= */
+.event-button {
+    background-color: #0077ff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 16px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background-color 0.2s ease;
+}
+
+.event-button:hover {
+    background-color: #005fd4;
+}
+
+/* =============================
+   Aucun événement
+============================= */
+.no-event {
+    width: 100%;
+    text-align: center;
+    color: #777;
+    font-size: 1.2em;
+    padding: 100px 0;
+}
+
+/* =============================
+   Responsive (mobile)
+============================= */
+@media (max-width: 600px) {
+    .event-card {
+        width: 90%;
+    }
+}
