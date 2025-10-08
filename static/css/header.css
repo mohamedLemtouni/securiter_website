@@ -1,4 +1,4 @@
-header {
+#hd{
       position: fixed;
       width: 100%;
       top: 0;
@@ -11,28 +11,27 @@ header {
       z-index: 1000;
     }
 
-header .logo {
-      font-size: 20px;
-      font-weight: bold;
-      color: #fff;
+#hd .logo a img  {
+      height: 15%;
+      width: 15%;
     }
 
-nav ul {
+#hd nav ul {
       display: flex;
       list-style: none;
     }
 
-nav ul li {
+#hd nav ul li {
       margin: 0 15px;
     }
 
-nav ul li a {
+#hd nav ul li a {
       color: #fff;
       text-decoration: none;
       font-size: 14px;
       transition: color 0.3s;
     }
 
-nav ul li a:hover {
+#hd nav ul li a:hover {
       color: #ff4500;
     }

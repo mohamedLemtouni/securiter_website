@@ -10,10 +10,12 @@
 	<link rel="stylesheet" href="/static/css/conex.css">
 	<link rel="stylesheet" href="/static/css/header.css">
   	<link rel="stylesheet" href="/static/css/footer.css">
-	<link rel="icon" sizes="192x192" href="img/logo_sans_fond.png">
+ 	<title>Azure Travel</title>
+    <link rel="icon" sizes="192x192" href="./photos/logo_wbl.png">
 </head>
 
 <?php include("header.php") ?>
+
 <body>
 	<div class="section">
 		<div class="container">

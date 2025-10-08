@@ -50,15 +50,6 @@ h6 span {
   display: none;
 }
 
-header img {
-  height: 40px;
-  width: 45px;
-  margin: 10px;
-  border: 2px solid black;
-  padding: 4px;
-  border-radius: 5px;
-}
-
 .checkbox:checked+label,
 .checkbox:not(:checked)+label {
   position: relative;

@@ -1,13 +1,13 @@
   <!-- Navbar -->
     <?php if (!isset($_SESSION["idcli"])) {
       ?>
-        <header>
-    <div class="logo"><a href="index.php" style="color:white;text-decoration:None">Yalla</a></div>
+        <header id="hd">
+    <div class="logo"><a href="index.php"><img src="./photos/logo_bw.png"></a></div>
     <nav>
       <ul>
-        <li><a href="test.php">test</a></li>
-        <li><a href="#">p2</a></li>
-        <li><a href="#">p3</a></li>
+        <li><a href="index.php">Home</a></li>
+        <li><a href="activiter.php">Activity</a></li>
+        <li><a href="evenement.php">Event</a></li>
         <li><a href="connexion.php">Login</a></li>
       </ul>
     </nav>
@@ -21,11 +21,10 @@
     <div class="logo"><a href="index.php" style="color:white;text-decoration:None">Yalla</a></div>
     <nav>
       <ul>
-        <li><a href="test.php">test</a></li>
-        <li><a href="#">p2</a></li>
-        <li><a href="#">p3</a></li>
-        <li><a href="profil">My Profil</a></li>
-        <li><p>Welcome <?php echo $result["NOM_CLI"] . ' ' . $result["PRENOM_CLI"]?></p></li>
+        <li><a href="index.php">Home</a></li>
+        <li><a href="activiter.php">Activity</a></li>
+        <li><a href="evenement.php">Event</a></li>
+        <li><a href="profil.php"><?php echo $result["NOM_CLI"] . ' ' . $result["PRENOM_CLI"]?></a></li>
       </ul>
     </nav>
   </header>

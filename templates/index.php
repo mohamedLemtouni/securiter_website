@@ -8,12 +8,12 @@ include("db.php");?>
   <link rel="stylesheet" href="/static/css/styleindex.css">
   <link rel="stylesheet" href="/static/css/header.css">
   <link rel="stylesheet" href="/static/css/footer.css">
-  <title>Travel Landing Page</title>
+  <title>Azure Travel</title>
+      <link rel="icon" sizes="192x192" href="./photos/logo_wbl.png">
 </head>
+
+<?php include("header.php") ?>
 <body>
-
-<?php include("header.php");?>
-
   <!-- Hero Section -->
   <section class="hero">
     <h1>Want to visit Morocco ?</h1>
