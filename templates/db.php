@@ -14,7 +14,6 @@ try {
     try {
         $db = new PDO("mysql:host=localhost;dbname=travel_db;charset=utf8", $appUser, $appPassword);
         $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        // La base existe déjà
     } catch (PDOException $e) {
         // La base n'existe pas → créer avec root
         $rootPdo = new PDO("mysql:host=localhost;charset=utf8", $rootUser, $rootPassword);

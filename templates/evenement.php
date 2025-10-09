@@ -18,7 +18,7 @@ include "db.php";
     <main class="event-container">
         <?php 
         if(!isset($_GET["town"])){
-            $cmd = $db->prepare("SELECT * FROM ACTIVITE_EVENEMENT WHERE TYPE = 'evenement';");
+            $cmd = $db->prepare("SELECT * FROM ACTIVITE_EVENEMENT WHERE TYPE_ACT_EVENT = 'evenement';");
             $cmd->execute();
             $nb_ligne = $cmd->rowCount();   
 

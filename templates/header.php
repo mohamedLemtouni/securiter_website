@@ -17,7 +17,7 @@
       $cmd->execute([$_SESSION["idcli"]]);
       $result = $cmd->fetch(PDO::FETCH_ASSOC);
       ?>
-    <header>
+    <header id="hd">
     <div class="logo"><a href="index.php" style="color:white;text-decoration:None">Yalla</a></div>
     <nav>
       <ul>
