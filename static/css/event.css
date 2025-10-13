@@ -1,84 +1,139 @@
-/* =============================
-   Mise en page principale
-============================= */
-.event-container {
+
+/* ====== RESET & BASE ====== */
+body {
+  height: 100%;
+  width: auto;
+  background: #f8f9fa;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #333;
+  margin: 0;
+}
+/* ===== GLOBAL LAYOUT ===== */
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Main prend tout l'espace disponible entre header et footer */
+main.main-container {
+    flex: 1;
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
-    gap: 25px;
-    padding: 50px 20px;
-    min-height: 300px;
-    background-color: #fafafa;
+    gap: 20px; /* si tu veux espacement entre les cartes */
+    padding: 20px;
+    justify-content: center; /* centre les cartes horizontalement */
+    align-items: flex-start;
+    background-color: #f5f5f5; /* optionnel, couleur de fond */
 }
 
-/* =============================
-   Carte d'événement
-============================= */
-.event-card {
-    background: #ffffff;
-    border-radius: 15px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    width: 280px;
-    padding: 25px;
+/* Footer déjà stylé, reste en bas grâce à flex */
+footer {
+    background: #0d0d0d;
     text-align: center;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.event-card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 6px 16px rgba(0,0,0,0.15);
-}
-
-/* =============================
-   Titre & Description
-============================= */
-.event-title {
-    font-size: 1.4em;
-    color: #333;
-    margin-bottom: 10px;
-}
-
-.event-description {
-    font-size: 0.95em;
-    color: #555;
-    line-height: 1.5;
-    margin-bottom: 20px;
-}
-
-/* =============================
-   Bouton
-============================= */
-.event-button {
-    background-color: #0077ff;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    padding: 10px 16px;
-    cursor: pointer;
-    font-size: 0.9em;
-    transition: background-color 0.2s ease;
-}
-
-.event-button:hover {
-    background-color: #005fd4;
-}
-
-/* =============================
-   Aucun événement
-============================= */
-.no-event {
+    padding: 20px;
+    font-size: 14px;
+    border-top: 1px solid #222;
     width: 100%;
-    text-align: center;
-    color: #777;
-    font-size: 1.2em;
-    padding: 100px 0;
+    color: white;
+    flex-shrink: 0;
 }
 
-/* =============================
-   Responsive (mobile)
-============================= */
-@media (max-width: 600px) {
-    .event-card {
-        width: 90%;
-    }
+
+/* ====== MAIN GRID ====== */
+.main-container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  display: grid;
+  gap: 2rem;
+  padding: 0 1rem;
+}
+
+/* ====== ACTIVITY CARD ====== */
+.activity-card {
+  display: flex;
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.activity-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 25px rgba(0,0,0,0.15);
+}
+
+.activity-info {
+  flex: 1;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.activity-info h2 {
+  font-size: 1.6rem;
+  color: #004aad;
+  margin-bottom: 0.5rem;
+}
+
+.activity-info p.description {
+  font-size: 1rem;
+  color: #555;
+  margin-bottom: 1rem;
+}
+
+.activity-info p.price {
+  font-weight: bold;
+  font-size: 1.2rem;
+  color: #28a745;
+  margin-bottom: 1rem;
+}
+
+.activity-info form button {
+  background: #004aad;
+  color: #fff;
+  border: none;
+  padding: 0.7rem 1.2rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.activity-info form button:hover {
+  background: #003080;
+}
+
+/* ====== SWIPER ====== */
+.activity-slider {
+  width: 300px;
+  flex-shrink: 0;
+}
+
+.swiper-slide img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-left: 1px solid #eee;
+  border-radius: 0 12px 12px 0;
+}
+
+/* ====== RESPONSIVE ====== */
+@media (max-width: 900px) {
+  .activity-card {
+    flex-direction: column;
+  }
+  .activity-slider {
+    width: 100%;
+    height: 250px;
+  }
+  .swiper-slide img {
+    height: 100%;
+    border-left: none;
+    border-top: 1px solid #eee;
+    border-radius: 0 0 12px 12px;
+  }
 }
