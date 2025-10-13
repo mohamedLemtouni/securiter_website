@@ -47,7 +47,7 @@ $images = $stmtImg->fetchAll(PDO::FETCH_COLUMN);
 <body class="bg-gray-50 text-gray-800">
 
     <!-- Conteneur principal -->
-    <div class="max-w-5xl mx-auto mt-10 p-6 bg-white rounded-2xl shadow-lg">
+    <div class="max-w-5xl mx-auto mt-10 p-6 bg-white rounded-2xl shadow-lg" style="margin-bottom: 2%;">
         <!-- Titre -->
         <h1 class="text-3xl font-bold text-gray-900 mb-4"><?= htmlspecialchars($event['NOM']) ?></h1>
 

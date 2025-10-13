@@ -24,9 +24,9 @@
         <li><a href="index.php">Home</a></li>
         <li><a href="activiter.php">Activity</a></li>
         <li><a href="evenement.php">Event</a></li>
-        <li><a href="profil.php"><?php echo $result["NOM_CLI"] . ' ' . $result["PRENOM_CLI"]?></a></li>
       </ul>
     </nav>
+       <div><a href="profil.php"><?php echo $result["NOM_CLI"] . ' ' . $result["PRENOM_CLI"]?></a></div>
   </header>
   <?php }?>
 
