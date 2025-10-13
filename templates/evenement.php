@@ -38,7 +38,7 @@ else {
       <h2><?= htmlspecialchars($even["NOM"]) ?></h2>
       <p class="description"><?= htmlspecialchars($even["DESCRIPTION_COURTE"] ?? '') ?></p>
       <p class="price"><?= number_format($even["PRIX"],2,',',' ') ?> MAD</p>
-      <form action="reservation.php" method="POST">
+      <form action="detail_actievent.php?val=<?php echo $even["ID_ACT_EV"]?>" method="POST">
         <input type="hidden" name="id_activite" value="<?= $even["ID_ACT_EV"] ?>">
         <button type="submit">Réserver</button>
       </form>
