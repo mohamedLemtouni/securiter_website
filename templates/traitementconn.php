@@ -2,22 +2,33 @@
 session_start();
 include("db.php");
 
-if (isset($_GET["value"])) {
-    $value = $_GET["value"];
-} else {
-    echo "value pas transmis";
+if (!isset($_GET["value"])) {
+    exit("Paramètre 'value' manquant.");
 }
 
+$value = $_GET["value"];
+
 function afficherMessage($message, $lien = "connexion.php", $type = "info") {
+    $message = htmlspecialchars($message, ENT_QUOTES, 'UTF-8');
+    $lien = htmlspecialchars($lien, ENT_QUOTES, 'UTF-8');
+    $type = htmlspecialchars($type, ENT_QUOTES, 'UTF-8');
+
     echo "<!DOCTYPE html>
     <html lang='fr'>
     <head>
         <meta charset='UTF-8'>
         <title>Message</title>
-        <!-- Import SweetAlert2 -->
         <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
         <style>
-            body { font-family: Arial, sans-serif; background: #f0f0f0; display: flex; justify-content: center; align-items: center; height: 100vh; }
+            body {
+                font-family: Arial, sans-serif;
+                background: #f0f0f0;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                margin: 0;
+            }
         </style>
     </head>
     <body>
@@ -28,76 +39,77 @@ function afficherMessage($message, $lien = "connexion.php", $type = "info") {
                 icon: '$type',
                 confirmButtonText: 'OK',
                 confirmButtonColor: '#3085d6'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.location.href = '$lien';
-                }
+            }).then(() => {
+                window.location.href = '$lien';
             });
         </script>
     </body>
     </html>";
-    exit();
+    exit;
 }
 
-if ($value == "conn") {
-    if (!empty($_POST["email"]) && !empty($_POST["password"])) {
+switch ($value) {
+    case "conn":
+        if (!empty($_POST["email"]) && !empty($_POST["password"])) {
+            $email = strtolower(trim($_POST["email"]));
+            $password = $_POST["password"];
 
-        $email = strtolower(trim($_POST["email"])); // nettoyer l'email
-        $password = $_POST["password"];
+            $cmd = $db->prepare("SELECT * FROM CLIENT WHERE EMAIL_CLI = :mail");
+            $cmd->execute([":mail" => $email]);
+            $client = $cmd->fetch(PDO::FETCH_ASSOC);
 
-        $cmd = $db->prepare("SELECT * FROM CLIENT WHERE EMAIL_CLI=:mail");
-        $cmd->execute([":mail" => $email]);
-        $client = $cmd->fetch(PDO::FETCH_ASSOC);
+            if (!$client) {
+                afficherMessage("Mail inconnue", "connexion.php", "error");
+            }
 
-        if (!$client) {
-            afficherMessage("Ce mail n'est pas inscrit !", "connexion.php", "error");
-        } elseif ($client["STATUT_CLI"] == "inactif") {
-            afficherMessage("Compte désactivé !", "connexion.php", "warning");
-        } elseif (password_verify($password, $client["MDP_CLI"])) {
-            $_SESSION["idcli"] = $client["ID_CLIENT"];
-            afficherMessage("Connexion réussie !", "index.php", "success");
+            if ($client["STATUT_CLI"] === "inactif") {
+                afficherMessage("Compte désactivé !", "connexion.php", "warning");
+            }
+
+            if (password_verify($password, $client["MDP_CLI"])) {
+                $_SESSION["idcli"] = $client["ID_CLIENT"];
+                afficherMessage("Connexion réussie !", "index.php", "success");
+            } else {
+                afficherMessage("Mot de passe incorrect !", "connexion.php", "error");
+            }
         } else {
-            afficherMessage("Mot de passe incorrect !", "connexion.php", "error");
+            afficherMessage("Veuillez remplir tous les champs de connexion !", "connexion.php", "warning");
         }
+        break;
 
-    } else {
-        afficherMessage("Veuillez remplir tous les champs de connexion !", "connexion.php", "warning");
-    }
+    case "inscription":
+        if (!empty($_POST["nom"]) && !empty($_POST["prenom"]) && !empty($_POST["email"]) && !empty($_POST["password"]) && !empty($_POST["numtel"])) {
+            $nom = trim($_POST["nom"]);
+            $prenom = trim($_POST["prenom"]);
+            $email = strtolower(filter_var(trim($_POST["email"]), FILTER_SANITIZE_EMAIL));
+            $tel = trim($_POST["numtel"]);
+            $password = $_POST["password"];
+            $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
-} elseif ($value == "inscription") {
-    if (!empty($_POST["nom"]) && !empty($_POST["prenom"]) && !empty($_POST["email"]) && !empty($_POST["password"]) && !empty($_POST["numtel"])) {
+            $cmd = $db->prepare("SELECT 1 FROM CLIENT WHERE EMAIL_CLI = :mail");
+            $cmd->execute([":mail" => $email]);
 
-        $nom = trim($_POST["nom"]);
-        $prenom = trim($_POST["prenom"]);
-        $email = strtolower(trim($_POST["email"]));
-        $tel = trim($_POST["numtel"]);
-        $password = $_POST["password"];
-        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+            if ($cmd->fetch()) {
+                afficherMessage("Vous êtes déjà inscrit !", "connexion.php", "info");
+            }
 
-        $cmd = $db->prepare("SELECT * FROM CLIENT WHERE EMAIL_CLI=:mail");
-        $cmd->execute([":mail" => $email]);
-
-        if ($cmd->fetch()) {
-            afficherMessage("Vous êtes déjà inscrit !", "connexion.php", "info");
-        } else {
-            $db->prepare("INSERT INTO CLIENT (NOM_CLI, PRENOM_CLI, EMAIL_CLI, TEL_CLI, MDP_CLI)
-                          VALUES (:nom, :prenom, :mail, :tel, :pwd)")
-               ->execute([
-                   ":nom" => $nom,
-                   ":prenom" => $prenom,
-                   ":mail" => $email,
-                   ":tel" => $tel,
-                   ":pwd" => $hashedPassword,
-               ]);
+            $insert = $db->prepare("INSERT INTO CLIENT (NOM_CLI, PRENOM_CLI, EMAIL_CLI, TEL_CLI, MDP_CLI)
+                                    VALUES (:nom, :prenom, :mail, :tel, :pwd)");
+            $insert->execute([
+                ":nom" => $nom,
+                ":prenom" => $prenom,
+                ":mail" => $email,
+                ":tel" => $tel,
+                ":pwd" => $hashedPassword,
+            ]);
 
             afficherMessage("Inscription réussie ! Vous pouvez maintenant vous connecter.", "connexion.php", "success");
+        } else {
+            afficherMessage("Veuillez remplir tous les champs de l'inscription !", "inscription.php", "warning");
         }
+        break;
 
-    } else {
-        afficherMessage("Veuillez remplir tous les champs de l'inscription !", "inscription.php", "warning");
-    }
-
-} else {
-    afficherMessage("Action inconnue !", "connexion.php", "error");
+    default:
+        afficherMessage("Action inconnue !", "connexion.php", "error");
 }
 ?>

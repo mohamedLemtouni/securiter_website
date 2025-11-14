@@ -59,15 +59,39 @@ form button { padding:8px 16px; border:none; background:#1e1e2d; color:white; bo
 form button:hover { background:#3b3b54; }
 
 @media(max-width:768px){.sidebar{display:none;}.main-content{padding:10px;}}
+
+/* ====== IMAGES ACTIVITÉ ====== */
+.activity-images {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.activity-images img {
+    width: 140px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease;
+}
+
+.activity-images img:hover {
+    transform: scale(1.05);
+}
+
+
 </style>
 </head>
 <body>
 
 <div class="sidebar">
     <h2>Admin Panel</h2>
-    <a class="active" onclick="switchTab('dashboard', this)">Dashboard</a>
-    <a onclick="switchTab('users', this)">Utilisateurs</a>
-    <a onclick="switchTab('activities', this)">Activités & Événements</a>
+    <a class="<?= (!isset($_GET['tab']) || $_GET['tab']=='dashboard') ? 'active' : '' ?>" onclick="switchTab('dashboard', this)">Dashboard</a>
+    <a class="<?= (isset($_GET['tab']) && $_GET['tab']=='users') ? 'active' : '' ?>" onclick="switchTab('users', this)">Utilisateurs</a>
+    <a class="<?= (isset($_GET['tab']) && $_GET['tab']=='activities') ? 'active' : '' ?>" onclick="switchTab('activities', this)">Activités & Événements</a>
     <a href="index.php">Main Page</a>
 </div>
 
@@ -78,7 +102,6 @@ form button:hover { background:#3b3b54; }
     </div>
 
 <?php
-// ==== DATA ====
 $cmd_cli = $db->prepare("SELECT * FROM CLIENT");
 $cmd_cli->execute();
 $result_cli = $cmd_cli->fetchAll(PDO::FETCH_ASSOC);
@@ -96,18 +119,31 @@ $prix_t_formatted = number_format($prix_t, 2, ',', ' ');
 $cmd_activ = $db->prepare("SELECT * FROM ACTIVITE_EVENEMENT ORDER BY DATE_DEBUT DESC");
 $cmd_activ->execute();
 $result_activ = $cmd_activ->fetchAll(PDO::FETCH_ASSOC);
-?>
+$edit_user = null;
 
-<!-- ====== TABS ====== -->
-<div id="dashboard" class="tab active">
+if (isset($_GET['edit_user'])) {
+    $id = (int) $_GET['edit_user'];
+    $stmt = $db->prepare("SELECT * FROM CLIENT WHERE ID_CLIENT = ?");
+    $stmt->execute([$id]);
+    $edit_user = $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+$edit_activity = null;
+if (isset($_GET['edit_activity'])) {
+    $id = (int) $_GET['edit_activity'];
+    $stmt = $db->prepare("SELECT * FROM ACTIVITE_EVENEMENT WHERE ID_ACT_EV = ?");
+    $stmt->execute([$id]);
+    $edit_activity = $stmt->fetch(PDO::FETCH_ASSOC);
+}
+?>
+<div id="dashboard" class="tab <?= (!isset($_GET['tab']) || $_GET['tab']=='dashboard') ? 'active' : '' ?>">
     <div class="cards">
         <div class="card"><h3>Utilisateurs inscrits</h3><p><?= $nb_client ?></p></div>
         <div class="card"><h3>Participations</h3><p><?= $nb_part ?></p></div>
         <div class="card"><h3>Revenus</h3><p><?= $prix_t_formatted ?> MAD</p></div>
     </div>
 </div>
-
-<div id="users" class="tab">
+<div id="users" class="tab <?= (isset($_GET['tab']) && $_GET['tab']=='users') ? 'active' : '' ?>">
     <div class="table-section">
         <h2>Liste des utilisateurs</h2>
         <table>
@@ -121,40 +157,50 @@ $result_activ = $cmd_activ->fetchAll(PDO::FETCH_ASSOC);
                     <td><?= $user['TEL_CLI'] ?></td>
                     <td><?= $user['STATUT_CLI'] ?></td>
                     <td>
-                        <button class="edit-btn" onclick='editUser(<?= json_encode($user) ?>)'>Modifier</button>
-                        <button class="edit-btn delete" onclick='deleteUser(<?= $user["ID_CLIENT"] ?>)'>Supprimer</button>
+                        <a href="admn.php?tab=users&edit_user=<?= $user['ID_CLIENT'] ?>" class="edit-btn">Modifier</a>
+                        <a href="admin_traitement.php?value=delete_user&id=<?= $user['ID_CLIENT'] ?>" class="edit-btn delete" onclick="return confirm('Supprimer cet utilisateur ?')">Supprimer</a>
                     </td>
                 </tr>
             <?php } ?>
             </tbody>
         </table>
     </div>
-
-    <div class="table-section" id="edit-form-section" style="display:none;">
+    <?php if ($edit_user): ?>
+    <div class="table-section">
         <h2>Modifier Utilisateur</h2>
         <form action="admin_traitement.php?value=update_user" method="POST">
-            <input type="hidden" name="ID_CLIENT" id="ID_CLIENT">
-            <label>Nom :</label><input type="text" name="NOM_CLI" id="NOM_CLI" required>
-            <label>Prénom :</label><input type="text" name="PRENOM_CLI" id="PRENOM_CLI" required>
-            <label>Email :</label><input type="email" name="EMAIL_CLI" id="EMAIL_CLI" required>
-            <label>Téléphone :</label><input type="text" name="TEL_CLI" id="TEL_CLI">
+            <input type="hidden" name="ID_CLIENT" value="<?= $edit_user['ID_CLIENT'] ?>">
+            <label>Nom :</label><input type="text" name="NOM_CLI" value="<?= htmlspecialchars($edit_user['NOM_CLI']) ?>" required>
+            <label>Prénom :</label><input type="text" name="PRENOM_CLI" value="<?= htmlspecialchars($edit_user['PRENOM_CLI']) ?>" required>
+            <label>Email :</label><input type="email" name="EMAIL_CLI" value="<?= htmlspecialchars($edit_user['EMAIL_CLI']) ?>" required>
+            <label>Téléphone :</label><input type="text" name="TEL_CLI" value="<?= htmlspecialchars($edit_user['TEL_CLI']) ?>">
             <label>Statut :</label>
-            <select name="STATUT_CLI" id="STATUT_CLI">
-                <option value="normal">Normal</option><option value="admin">Admin</option>
-                <option value="inactif">Inactif</option><option value="partenaire">Partenaire</option>
+            <select name="STATUT_CLI">
+                <option value="normal" <?= ($edit_user['STATUT_CLI']=='normal')?'selected':'' ?>>Normal</option>
+                <option value="admin" <?= ($edit_user['STATUT_CLI']=='admin')?'selected':'' ?>>Admin</option>
+                <option value="inactif" <?= ($edit_user['STATUT_CLI']=='inactif')?'selected':'' ?>>Inactif</option>
+                <option value="partenaire" <?= ($edit_user['STATUT_CLI']=='partenaire')?'selected':'' ?>>Partenaire</option>
             </select>
             <button type="submit">Enregistrer</button>
         </form>
     </div>
+    <?php endif; ?> 
 </div>
-
-<!-- ====== ACTIVITES ====== -->
-<div id="activities" class="tab">
+<div id="activities" class="tab <?= (isset($_GET['tab']) && $_GET['tab']=='activities') ? 'active' : '' ?>">
     <div class="table-section">
         <h2>Liste des activités et événements</h2>
-        <button style="margin-bottom:15px;" onclick="showAddForm()">+ Ajouter</button>
+        <a href="admn.php?tab=activities&add_activity=1" class="edit-btn" style="margin-bottom:15px;display:inline-block;">+ Ajouter</a>
         <table>
-            <thead><tr><th>ID</th><th>Nom</th><th>Type</th><th>Date début</th><th>Prix</th><th>Action</th></tr></thead>
+            <thead>
+            <tr>
+            <th>ID</th>
+            <th>Nom</th>
+            <th>Type</th>
+            <th>Date début</th>
+            <th>Prix</th>
+            <th>Visibile</th>
+            <th>Action</th>
+        </tr></thead>
             <tbody>
             <?php foreach($result_activ as $act){ ?>
                 <tr>
@@ -163,80 +209,95 @@ $result_activ = $cmd_activ->fetchAll(PDO::FETCH_ASSOC);
                     <td><?= $act['TYPE_ACT_EVENT'] ?></td>
                     <td><?= $act['DATE_DEBUT'] ?></td>
                     <td><?= $act['PRIX'] ?> MAD</td>
+                    <td><?= $act['VISIBLE'] ? 'oui':'non'; ?></td>
                     <td>
-                        <button class="edit-btn" onclick='editActivity(<?= json_encode($act) ?>)'>Modifier</button>
-                        <button class="edit-btn delete" onclick='deleteActivity(<?= $act["ID_ACT_EV"] ?>)'>Supprimer</button>
+                        <a href="admn.php?tab=activities&edit_activity=<?= $act['ID_ACT_EV'] ?>" class="edit-btn">Modifier</a>
+                        <a href="admin_traitement.php?value=delete_activity&id=<?= $act['ID_ACT_EV'] ?>" class="edit-btn delete" onclick="return confirm('Supprimer cette activité ?')">Supprimer</a>
                     </td>
                 </tr>
             <?php } ?>
             </tbody>
         </table>
     </div>
-
-    <div class="table-section" id="activity-form" style="display:none;">
-        <h2 id="form-title">Ajouter une activité / événement</h2>
+    <?php if ($edit_activity || isset($_GET['add_activity'])): ?>
+    <div class="table-section">
+        <h2><?= $edit_activity ? 'Modifier une activité / événement' : 'Ajouter une activité / événement' ?></h2>
         <form action="admin_traitement.php?value=save_activity" method="POST" enctype="multipart/form-data">
-            <input type="hidden" name="ID_ACT_EV" id="ID_ACT_EV">
-            <label>Nom :</label><input type="text" name="NOM" id="NOM" required>
-            <label>Description courte :</label><input type="text" name="DESCRIPTION_COURTE" id="DESCRIPTION_COURTE">
-            <label>Description complète :</label><textarea name="DESCRIPTION_CMPLT" id="DESCRIPTION_CMPLT" rows="4"></textarea>
+            <input type="hidden" name="ID_ACT_EV" value="<?= $edit_activity['ID_ACT_EV'] ?? '' ?>">
+            <label>Nom :</label><input type="text" name="NOM" value="<?= htmlspecialchars($edit_activity['NOM'] ?? '') ?>" required>
+            <label>Description courte :</label><input type="text" name="DESCRIPTION_COURTE" value="<?= htmlspecialchars($edit_activity['DESCRIPTION_COURTE'] ?? '') ?>">
+            <label>Description complète :</label><textarea name="DESCRIPTION_CMPLT" rows="4"><?= htmlspecialchars($edit_activity['DESCRIPTION_CMPLT'] ?? '') ?></textarea>
             <label>Type :</label>
-            <select name="TYPE_ACT_EVENT" id="TYPE_ACT_EVENT" required>
-                <option value="activite">Activité</option><option value="evenement">Événement</option>
+            <select name="TYPE_ACT_EVENT" required>
+                <option value="activite" <?= (isset($edit_activity['TYPE_ACT_EVENT']) && $edit_activity['TYPE_ACT_EVENT']=='activite')?'selected':'' ?>>Activité</option>
+                <option value="evenement" <?= (isset($edit_activity['TYPE_ACT_EVENT']) && $edit_activity['TYPE_ACT_EVENT']=='evenement')?'selected':'' ?>>Événement</option>
             </select>
-            <label>Date début :</label><input type="datetime-local" name="DATE_DEBUT" id="DATE_DEBUT" required>
-            <label>Date fin :</label><input type="datetime-local" name="DATE_FIN" id="DATE_FIN">
+            <label>Date début :</label><input type="datetime-local" name="DATE_DEBUT" value="<?= isset($edit_activity['DATE_DEBUT']) ? date('Y-m-d\TH:i', strtotime($edit_activity['DATE_DEBUT'])) : '' ?>" required>
+            <label>Date fin :</label><input type="datetime-local" name="DATE_FIN" value="<?= isset($edit_activity['DATE_FIN']) ? date('Y-m-d\TH:i', strtotime($edit_activity['DATE_FIN'])) : '' ?>">
+            <label>Visible :</label>
+            <select name="VISIBLE" required>
+                <option value="1" <?= (isset($edit_activity['VISIBLE']) && $edit_activity['VISIBLE'] == 1) ? 'selected' : '' ?>>Oui (Visible)</option>
+                <option value="0" <?= (isset($edit_activity['VISIBLE']) && $edit_activity['VISIBLE'] == 0) ? 'selected' : '' ?>>Non (Masqué)</option>
+            </select>
+
             <label>Organisateur :</label>
-            <select name="ID_CLIENT_ORGANISATEUR" id="ID_CLIENT_ORGANISATEUR">
+            <select name="ID_CLIENT_ORGANISATEUR">
                 <?php foreach($result_cli as $cli){ ?>
-                    <option value="<?= $cli['ID_CLIENT'] ?>"><?= $cli['NOM_CLI']." ".$cli['PRENOM_CLI'] ?></option>
+                    <option value="<?= $cli['ID_CLIENT'] ?>" <?= (isset($edit_activity['ID_CLIENT_ORGANISATEUR']) && $edit_activity['ID_CLIENT_ORGANISATEUR']==$cli['ID_CLIENT'])?'selected':'' ?>>
+                        <?= $cli['NOM_CLI']." ".$cli['PRENOM_CLI'] ?>
+                    </option>
                 <?php } ?>
             </select>
-            <label>Prix :</label><input type="number" step="0.01" name="PRIX" id="PRIX" required>
-            <label>Capacité :</label><input type="number" name="CAPACITE" id="CAPACITE">
+            <label>Prix :</label><input type="number" step="0.01" name="PRIX" value="<?= htmlspecialchars($edit_activity['PRIX'] ?? '') ?>" required>
+            <label>Capacité :</label><input type="number" name="CAPACITE" value="<?= htmlspecialchars($edit_activity['CAPACITE'] ?? '') ?>">
             <label>Difficulté :</label>
-            <select name="DIFFICULTE" id="DIFFICULTE">
-                <option value="facile">Facile</option><option value="moyen">Moyen</option><option value="difficile">Difficile</option>
+            <select name="DIFFICULTE">
+                <option value="facile" <?= (isset($edit_activity['DIFFICULTE']) && $edit_activity['DIFFICULTE']=='facile')?'selected':'' ?>>Facile</option>
+                <option value="moyen" <?= (isset($edit_activity['DIFFICULTE']) && $edit_activity['DIFFICULTE']=='moyen')?'selected':'' ?>>Moyen</option>
+                <option value="difficile" <?= (isset($edit_activity['DIFFICULTE']) && $edit_activity['DIFFICULTE']=='difficile')?'selected':'' ?>>Difficile</option>
             </select>
             <label>Public cible :</label>
-            <select name="PUBLIC_CIBLE" id="PUBLIC_CIBLE">
-                <option value="tous">Tous</option><option value="enfant">Enfant</option><option value="adulte">Adulte</option>
+            <select name="PUBLIC_CIBLE">
+                <option value="tous" <?= (isset($edit_activity['PUBLIC_CIBLE']) && $edit_activity['PUBLIC_CIBLE']=='tous')?'selected':'' ?>>Tous</option>
+                <option value="enfant" <?= (isset($edit_activity['PUBLIC_CIBLE']) && $edit_activity['PUBLIC_CIBLE']=='enfant')?'selected':'' ?>>Enfant</option>
+                <option value="adulte" <?= (isset($edit_activity['PUBLIC_CIBLE']) && $edit_activity['PUBLIC_CIBLE']=='adulte')?'selected':'' ?>>Adulte</option>
             </select>
-            <label>Tags :</label><input type="text" name="TAGS" id="TAGS">
-            <label>Images :</label><input type="file" name="images[]" id="images" multiple accept="image/*">
-            <div id="preview-container" style="display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;"></div>
+            <label>Tags :</label><input type="text" name="TAGS" value="<?= htmlspecialchars($edit_activity['TAGS'] ?? '') ?>">
+            <label>Images :</label><input type="file" name="images[]" multiple accept="image/*">
             <button type="submit">Enregistrer</button>
         </form>
+        <?php if (!is_null($edit_activity)){?>
+        <p style="margin-top: 1%;">Images deja existantes: </p>
+        <div class="activity-images">
+            <?php $pics = $db->prepare("select * from IMAGE_ACTIVITE where ID_ACT_EV = :id ;"); 
+                    $pics->execute(["id" => $edit_activity["ID_ACT_EV"]]);
+                    $allpics = $pics->fetchAll(PDO::FETCH_ASSOC);
+                    if($allpics){
+                        foreach($allpics as $pic){
+                            ?> <div style="display: flex;flex-direction: column;align-items: center;">
+                            <img src="<?= htmlspecialchars($pic['URL_IMAGE']) ?>" >
+                            <a href="./delet_image.php?id_img=<?php echo $pic['ID_IMAGE']?>">
+                                <button style="margin-top: 20%;"> supprimer l'image</button>
+                            </a></div><?php
+                        }
+                    
+                }}
+                    ?>
+                    </div>
     </div>
+    <?php endif; ?>
 </div>
 
 </div>
 
 <script>
-document.getElementById('images').addEventListener('change', function(e){
-    const c=document.getElementById('preview-container'); c.innerHTML='';
-    for(const f of e.target.files){
-        const i=document.createElement('img'); i.src=URL.createObjectURL(f);
-        i.style.width='80px';i.style.height='80px';i.style.objectFit='cover';i.style.borderRadius='8px';
-        c.appendChild(i);
-    }
-});
-function switchTab(id,el){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-document.querySelectorAll('.sidebar a').forEach(a=>a.classList.remove('active'));
-document.getElementById(id).classList.add('active');el.classList.add('active');}
-function editUser(u){switchTab('users',document.querySelector('.sidebar a[onclick*="users"]'));
-document.getElementById('edit-form-section').style.display='block';for(let k in u){if(document.getElementById(k))document.getElementById(k).value=u[k];}}
-function showAddForm(){document.getElementById('form-title').textContent="Ajouter une activité / événement";
-document.getElementById('activity-form').style.display='block';document.querySelector('#activity-form form').reset();
-document.getElementById('ID_ACT_EV').value='';}
-function editActivity(a){switchTab('activities',document.querySelector('.sidebar a[onclick*="activities"]'));
-document.getElementById('form-title').textContent="Modifier activité / événement";
-document.getElementById('activity-form').style.display='block';
-for(let k in a){if(document.getElementById(k))document.getElementById(k).value=a[k];}}
-function deleteActivity(id){if(confirm("Supprimer cette activité ?"))fetch('admin_traitement.php?value=delete_activity&id='+id)
-.then(r=>r.json()).then(d=>{if(d.success){alert('Activité supprimée');location.reload();}else alert('Erreur : '+d.message);});}
-function deleteUser(id){if(confirm("Supprimer cet utilisateur ?"))fetch('admin_traitement.php?value=delete_user&id='+id)
-.then(r=>r.json()).then(d=>{if(d.success){alert('Utilisateur supprimé');location.reload();}else alert('Erreur : '+d.message);});}
+// Garder uniquement le switchTab
+function switchTab(id, el){
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.sidebar a').forEach(a=>a.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    el.classList.add('active');
+}
 </script>
 
 </body>

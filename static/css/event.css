@@ -1,134 +1,182 @@
-
-/* ====== RESET & BASE ====== */
+/* ===============================
+   BASE GLOBALE
+================================ */
 body {
-  width: auto;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   color: #333;
-  }
-/* ===== GLOBAL LAYOUT ===== */
-html, body {
-    height: 100%;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-}
-/* Main prend tout l'espace disponible entre header et footer */
-main.main-container {
-    flex: 1;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px; /* si tu veux espacement entre les cartes */
-    padding: 20px;
-    justify-content: center; /* centre les cartes horizontalement */
-    align-items: flex-start;
+  background-color: #f8f9fa;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
-/* Footer déjà stylé, reste en bas grâce à flex */
-footer {
-    background: #0d0d0d;
-    text-align: center;
-    padding: 20px;
-    font-size: 14px;
-    border-top: 1px solid #222;
-    width: 100%;
-    color: white;
-    flex-shrink: 0;
+main {
+  flex: 1;
 }
 
-
-/* ====== MAIN GRID ====== */
-.main-container {
-  max-width: 1200px;
+/* ===============================
+   FILTRES
+================================ */
+.filters-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+  align-items: center;
   margin: 2rem auto;
-  display: grid;
-  gap: 2rem;
   padding: 0 1rem;
 }
 
-/* ====== ACTIVITY CARD ====== */
+.filters-container input,
+.filters-container select,
+.filters-container button {
+  padding: 0.6rem 1rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  background-color: #fff;
+  transition: all 0.2s ease-in-out;
+}
+
+.filters-container input:focus,
+.filters-container select:focus {
+  outline: none;
+  border-color: #004aad;
+  box-shadow: 0 0 0 0.15rem rgba(0, 74, 173, 0.2);
+}
+
+.filters-container button {
+  background: #004aad;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+
+.filters-container button:hover {
+  background: #003080;
+}
+
+/* ===============================
+   GRILLE DES ACTIVITÉS
+================================ */
 .activity-card {
-  display: flex;
   background: #fff;
+  border: none;
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
 }
 
 .activity-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 12px 25px rgba(0,0,0,0.15);
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
 }
 
-.activity-info {
-  flex: 1;
-  padding: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-.activity-info h2 {
-  font-size: 1.6rem;
-  color: #004aad;
-  margin-bottom: 0.5rem;
-}
-
-.activity-info p.description {
-  font-size: 1rem;
-  color: #555;
-  margin-bottom: 1rem;
-}
-
-.activity-info p.price {
-  font-weight: bold;
-  font-size: 1.2rem;
-  color: #28a745;
-  margin-bottom: 1rem;
-}
-
-.activity-info form button {
-  background: #004aad;
-  color: #fff;
-  border: none;
-  padding: 0.7rem 1.2rem;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background 0.3s ease;
-}
-
-.activity-info form button:hover {
-  background: #003080;
-}
-
-/* ====== SWIPER ====== */
-.activity-slider {
-  width: 300px;
-  flex-shrink: 0;
+/* ===============================
+   IMAGES & SWIPER
+================================ */
+.swiper {
+  width: 100%;
+  height: 230px;
+  border-radius: 12px 12px 0 0;
+  overflow: hidden;
 }
 
 .swiper-slide img {
   width: 100%;
-  height: 200px;
+  height: 100%;
   object-fit: cover;
-  border-left: 1px solid #eee;
-  border-radius: 0 12px 12px 0;
 }
 
-/* ====== RESPONSIVE ====== */
-@media (max-width: 900px) {
-  .activity-card {
+/* ===============================
+   FIGURE & HOVER
+================================ */
+figure.tm-video-item {
+  position: relative;
+  overflow: hidden;
+  margin: 0;
+}
+
+figure.tm-video-item figcaption {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  opacity: 0;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  transition: opacity 0.3s ease;
+}
+
+figure.tm-video-item:hover figcaption {
+  opacity: 1;
+}
+
+figure.tm-video-item h2 {
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+}
+
+figure.tm-video-item a {
+  color: #fff;
+  text-decoration: underline;
+}
+
+/* ===============================
+   INFOS ÉVÉNEMENT
+================================ */
+.activity-card .event-info {
+  padding: 1rem;
+  display: flex;
+  justify-content: space-between;
+  color: #555;
+  font-size: 0.95rem;
+}
+
+.activity-card .event-info span:last-child {
+  font-weight: 600;
+  color: #28a745;
+}
+
+/* ===============================
+   RESPONSIVE
+================================ */
+@media (max-width: 992px) {
+  .swiper {
+    height: 210px;
+  }
+}
+
+@media (max-width: 768px) {
+  .filters-container {
     flex-direction: column;
+    align-items: stretch;
   }
-  .activity-slider {
+  .filters-container input,
+  .filters-container select,
+  .filters-container button {
     width: 100%;
-    height: 250px;
   }
-  .swiper-slide img {
-    height: 100%;
-    border-left: none;
-    border-top: 1px solid #eee;
-    border-radius: 0 0 12px 12px;
+  .swiper {
+    height: 200px;
+  }
+}
+
+@media (max-width: 576px) {
+  .activity-card {
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+  }
+  .swiper {
+    height: 180px;
   }
 }

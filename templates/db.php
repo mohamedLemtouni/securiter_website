@@ -7,41 +7,46 @@ $rootUser = "root";
 $rootPassword = "mon_vrai_mdp";
 $appUser = "appuser";
 $appPassword = "monmdp";
-$sqlFile = "db.sql";
+$dbFile = "db.sql";      // Création des tables
+$dataFile = "data.sql";  // Insertion des 100 entrées
 
 try {
-    // 1️⃣ Essayer de se connecter avec appuser
     try {
+        // Connexion avec l'utilisateur applicatif
         $db = new PDO("mysql:host=localhost;dbname=travel_db;charset=utf8", $appUser, $appPassword);
         $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     } catch (PDOException $e) {
-        // La base n'existe pas → créer avec root
+        // Connexion avec root pour initialiser la base
         $rootPdo = new PDO("mysql:host=localhost;charset=utf8", $rootUser, $rootPassword);
         $rootPdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-        // Créer l'utilisateur si nécessaire
+        // Création de l'utilisateur applicatif
         $rootPdo->exec("CREATE USER IF NOT EXISTS '$appUser'@'localhost' IDENTIFIED WITH mysql_native_password BY '$appPassword';");
         $rootPdo->exec("GRANT ALL PRIVILEGES ON travel_db.* TO '$appUser'@'localhost';");
         $rootPdo->exec("FLUSH PRIVILEGES;");
 
-        // Créer la base de données
+        // Création de la base
         $rootPdo->exec("CREATE DATABASE IF NOT EXISTS travel_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;");
 
-        // Lire et exécuter db.sql
-        if (!file_exists($sqlFile)) throw new Exception("Fichier $sqlFile introuvable !");
-        $sql = file_get_contents($sqlFile);
-
+        // Exécution du script de création des tables
+        if (!file_exists($dbFile)) throw new Exception("Fichier $dbFile introuvable !");
+        $sqlDb = file_get_contents($dbFile);
         $rootPdo->exec("USE travel_db;");
         $rootPdo->exec("SET FOREIGN_KEY_CHECKS = 0;");
-        $rootPdo->exec($sql);
+        $rootPdo->exec($sqlDb);
         $rootPdo->exec("SET FOREIGN_KEY_CHECKS = 1;");
 
-        // Reconnecter avec appuser
+        // Exécution du script d'insertion des données
+        if (!file_exists($dataFile)) throw new Exception("Fichier $dataFile introuvable !");
+        $sqlData = file_get_contents($dataFile);
+        $rootPdo->exec("SET FOREIGN_KEY_CHECKS = 0;");
+        $rootPdo->exec($sqlData);
+        $rootPdo->exec("SET FOREIGN_KEY_CHECKS = 1;");
+
+        // Connexion finale avec l'utilisateur applicatif
         $db = new PDO("mysql:host=localhost;dbname=travel_db;charset=utf8", $appUser, $appPassword);
         $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     }
-
-
 } catch (PDOException $e) {
     die("Erreur PDO : " . $e->getMessage());
 } catch (Exception $e) {

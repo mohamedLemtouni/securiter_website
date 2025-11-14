@@ -15,7 +15,6 @@
 </head>
 
 <?php include("header.php") ?>
-
 <body>
 	<div class="section">
 		<div class="container">
@@ -48,7 +47,7 @@
 												<button type="submit" class="btn mt-4">Se connecter</button>
 											</form>
 											<!-- End of Log In Form -->
-											<p class="mb-0 mt-4 text-center"><a href="../motdepasseoublier.php"
+											<p class="mb-0 mt-4 text-center"><a href="motdepasseoublier.php"
 													class="link">Mot de passe
 													oublié ?</a></p>
 										</div>
