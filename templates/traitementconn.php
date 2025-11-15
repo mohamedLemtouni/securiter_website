@@ -59,7 +59,7 @@ switch ($value) {
             $client = $cmd->fetch(PDO::FETCH_ASSOC);
 
             if (!$client) {
-                afficherMessage("Mail inconnue", "connexion.php", "error");
+                afficherMessage("Mail inconnu", "connexion.php", "error");
             }
 
             if ($client["STATUT_CLI"] === "inactif") {
@@ -78,21 +78,59 @@ switch ($value) {
         break;
 
     case "inscription":
-        if (!empty($_POST["nom"]) && !empty($_POST["prenom"]) && !empty($_POST["email"]) && !empty($_POST["password"]) && !empty($_POST["numtel"])) {
-            $nom = trim($_POST["nom"]);
-            $prenom = trim($_POST["prenom"]);
-            $email = strtolower(filter_var(trim($_POST["email"]), FILTER_SANITIZE_EMAIL));
-            $tel = trim($_POST["numtel"]);
-            $password = $_POST["password"];
-            $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+    if (!empty($_POST["nom"]) && !empty($_POST["prenom"]) && !empty($_POST["email"]) && !empty($_POST["password"]) && !empty($_POST["numtel"])) {
+        $nom = trim($_POST["nom"]);
+        $prenom = trim($_POST["prenom"]);
+        $email = strtolower(filter_var(trim($_POST["email"]), FILTER_SANITIZE_EMAIL));
+        $tel = trim($_POST["numtel"]);
+        $password = $_POST["password"];
+        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
-            $cmd = $db->prepare("SELECT 1 FROM CLIENT WHERE EMAIL_CLI = :mail");
-            $cmd->execute([":mail" => $email]);
+        // Vérifier si l'email existe déjà
+        $cmd = $db->prepare("SELECT 1 FROM CLIENT WHERE EMAIL_CLI = :mail");
+        $cmd->execute([":mail" => $email]);
+        if ($cmd->fetch()) {
+            afficherMessage("Vous êtes déjà inscrit !", "connexion.php", "info");
+        }
 
-            if ($cmd->fetch()) {
-                afficherMessage("Vous êtes déjà inscrit !", "connexion.php", "info");
+        // Gestion de la photo de profil
+        $photoProfil = null; // par défaut on ne met rien
+        if (isset($_FILES['profilpic']) && $_FILES['profilpic']['error'] === UPLOAD_ERR_OK) {
+            $fileTmpPath = $_FILES['profilpic']['tmp_name'];
+            $fileName = $_FILES['profilpic']['name'];
+            $fileNameCmps = explode(".", $fileName);
+            $fileExtension = strtolower(end($fileNameCmps));
+
+            $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif'];
+            if (in_array($fileExtension, $allowedExtensions)) {
+                $newFileName = md5(time() . $fileName) . '.' . $fileExtension;
+                $uploadFileDir = './photos/profilpic/';
+                $dest_path = $uploadFileDir . $newFileName;
+
+                if (move_uploaded_file($fileTmpPath, $dest_path)) {
+                    $photoProfil = $dest_path;
+                } else {
+                    afficherMessage("Erreur lors de l'upload de la photo.", "connexion.php", "error");
+                }
+            } else {
+                afficherMessage("Type de fichier non autorisé. JPG, JPEG, PNG, GIF uniquement.", "connexion.php", "error");
             }
+        }
 
+        // Insertion dans la base
+        if ($photoProfil) {
+            $insert = $db->prepare("INSERT INTO CLIENT (NOM_CLI, PRENOM_CLI, EMAIL_CLI, TEL_CLI, MDP_CLI, PHOTO_PROFILE)
+                                    VALUES (:nom, :prenom, :mail, :tel, :pwd, :photo)");
+            $insert->execute([
+                ":nom" => $nom,
+                ":prenom" => $prenom,
+                ":mail" => $email,
+                ":tel" => $tel,
+                ":pwd" => $hashedPassword,
+                ":photo" => $photoProfil,
+            ]);
+        } else {
+            // On n'inclut pas PHOTO_PROFILE, la base prendra la valeur par défaut
             $insert = $db->prepare("INSERT INTO CLIENT (NOM_CLI, PRENOM_CLI, EMAIL_CLI, TEL_CLI, MDP_CLI)
                                     VALUES (:nom, :prenom, :mail, :tel, :pwd)");
             $insert->execute([
@@ -102,13 +140,14 @@ switch ($value) {
                 ":tel" => $tel,
                 ":pwd" => $hashedPassword,
             ]);
-
-            afficherMessage("Inscription réussie ! Vous pouvez maintenant vous connecter.", "connexion.php", "success");
-        } else {
-            afficherMessage("Veuillez remplir tous les champs de l'inscription !", "inscription.php", "warning");
         }
-        break;
 
+        afficherMessage("Inscription réussie ! Vous pouvez maintenant vous connecter.", "connexion.php", "success");
+    } else {
+        afficherMessage("Veuillez remplir tous les champs de l'inscription !", "connexion.php", "warning");
+    }
+    break;
+    
     default:
         afficherMessage("Action inconnue !", "connexion.php", "error");
 }

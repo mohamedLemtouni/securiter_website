@@ -36,9 +36,14 @@ sort($allTags); // Tri alphabétique
   <link rel="stylesheet" href="fontawesome/css/all.min.css">
   <link rel="stylesheet" href="/static/css/templatemo-style.css">
   <link rel="stylesheet" href="/static/css/event.css">   
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css"/>
-  <link rel="stylesheet" href="/static/css/header.css">
+  <link rel="stylesheet" href="/static/css/header.css">  
+  <link rel="stylesheet" href="/static/css/card.css">
+
+  <!-- Material Cards CSS -->
+  <link rel="stylesheet" href="/static/css/material-cards.css">
+
   <style>
+
     .filters-container {
       display: flex;
       gap: 10px;
@@ -50,21 +55,10 @@ sort($allTags); // Tri alphabétique
       padding: 8px 12px;
       font-size: 14px;
     }
-    .activity-card { display: flex; flex-direction: column; transition: all 0.3s ease; }
-    .swiper { width: 100%; height: 230px; border-radius: 10px; overflow: hidden; }
-    .swiper-slide img { width: 100%; height: 100%; object-fit: cover; }
-    figure.tm-video-item { position: relative; overflow: hidden; margin: 0; }
-    figure.tm-video-item figcaption {
-      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.6); opacity: 0;
-      transition: opacity 0.4s ease; color: #fff;
-      text-align: center; display: flex; flex-direction: column;
-      justify-content: center; align-items: center;
-    }
-    figure.tm-video-item:hover figcaption { opacity: 1; }
-    figure.tm-video-item h2 { font-size: 1.3rem; margin-bottom: 8px; color: #fff; }
-    figure.tm-video-item a { color: #fff; text-decoration: underline; }
   </style>
+
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 
 <body>
@@ -86,93 +80,99 @@ sort($allTags); // Tri alphabétique
   <button id="filter-reset">Réinitialiser</button>
 </div>
 
-<!-- Grille des événements -->
-<div class="container">
-  <div class="row tm-mb-90 tm-gallery">
-    <?php
-    $cmd = $db->prepare("SELECT * FROM ACTIVITE_EVENEMENT WHERE TYPE_ACT_EVENT = 'activite' AND VISIBLE = 1 ORDER BY DATE_DEBUT DESC;");
-    $cmd->execute();
-    $events = $cmd->fetchAll(PDO::FETCH_ASSOC);
+<!-- Grille Material Cards -->
+<section class="container">
+    <div class="row active-with-click">
+        <?php
+        $cmd = $db->prepare("SELECT * FROM ACTIVITE_EVENEMENT WHERE TYPE_ACT_EVENT = 'activite' AND VISIBLE = 1 ORDER BY DATE_DEBUT DESC;");
+        $cmd->execute();
+        $events = $cmd->fetchAll(PDO::FETCH_ASSOC);
 
-    if(count($events) === 0){
-      echo "<p style='width:100%;text-align:center;'>Aucun événement disponible pour le moment.</p>";
-    } else {
-      foreach($events as $even){
-        $imgReq = $db->prepare("SELECT URL_IMAGE FROM IMAGE_ACTIVITE WHERE ID_ACT_EV = ?");
-        $imgReq->execute([$even["ID_ACT_EV"]]);
-        $images = $imgReq->fetchAll(PDO::FETCH_ASSOC);
-        $tags = strtolower($even['TAGS'] ?? '');
-    ?>
-      <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12 mb-5 activity-card"
-           data-name="<?= htmlspecialchars(strtolower($even['NOM'])) ?>"
-           data-price="<?= $even['PRIX'] ?>"
-           data-tags="<?= htmlspecialchars($tags) ?>"
-           data-favorite="<?= in_array($even['ID_ACT_EV'], $favoritesIds) ? '1' : '0' ?>">
-
-        <figure class="effect-ming tm-video-item">
-          <div class="swiper event-swiper">
-            <div class="swiper-wrapper">
-              <?php 
-              if (count($images) > 0) {
-                foreach ($images as $img) { ?>
-                  <div class="swiper-slide">
-                    <img src="<?= htmlspecialchars($img['URL_IMAGE']) ?>" alt="<?= htmlspecialchars($even['NOM']) ?>">
-                  </div>
-                <?php }
-              } else { ?>
-                <div class="swiper-slide">
-                  <img src="img/default.jpg" alt="Image par défaut">
+        if(count($events) === 0){
+            echo "<p style='width:100%;text-align:center;'>Aucun événement disponible pour le moment.</p>";
+        } else {
+            $colors = ["Red","Pink","Purple","Deep-Purple","Indigo","Blue","Light-Blue","Cyan","Teal","Green","Light-Green","Lime","Yellow","Amber","Orange","Deep-Orange","Brown","Grey","Blue-Grey"];
+            $colorCount = count($colors);
+            $i = 0;
+            foreach($events as $even){
+                $imgReq = $db->prepare("SELECT URL_IMAGE FROM IMAGE_ACTIVITE WHERE ID_ACT_EV = ?");
+                $imgReq->execute([$even["ID_ACT_EV"]]);
+                $images = $imgReq->fetchAll(PDO::FETCH_ASSOC);
+                $imgUrl = count($images) > 0 ? $images[0]['URL_IMAGE'] : 'img/default.jpg';
+                $color = $colors[$i % $colorCount];
+                $i++;
+        ?>
+        <div class="col-md-4 col-sm-6 col-xs-12">
+            <article class="material-card <?= $color ?>">
+                <h2>
+                    <span><?= htmlspecialchars($even['NOM']) ?></span>
+                    <strong>
+                        <i class="fa fa-fw fa-star"></i>
+                        <?= number_format($even["PRIX"], 2, ',', ' ') ?> MAD
+                    </strong>
+                </h2>
+                <div class="mc-content">
+                    <div class="img-container">
+                        <img class="img-responsive" src="<?= htmlspecialchars($imgUrl) ?>">
+                    </div>
+                    <div class="mc-description">
+                        <?= htmlspecialchars(substr($even['DESCRIPTION_COURTE'] ?? '', 0, 150)) ?>...
+                    </div>
                 </div>
-              <?php } ?>
-            </div>
-            <div class="swiper-pagination"></div>
-          </div>
-
-          <figcaption class="d-flex align-items-center justify-content-center">
-            <h2><?= htmlspecialchars($even['NOM']) ?></h2>
-            <a href="detail_actievent.php?val=<?= $even['ID_ACT_EV'] ?>">Voir plus</a>
-          </figcaption>
-        </figure>
-
-        <div class="d-flex justify-content-between tm-text-gray mt-2">
-          <span class="tm-text-gray-light"><?= date("d M Y", strtotime($even["DATE_DEBUT"])) ?></span>
-          <span><?= number_format($even["PRIX"], 2, ',', ' ') ?> MAD</span>
+                <a class="mc-btn-action">
+                    <i class="fa fa-bars"></i>
+                </a>
+                <div class="mc-footer">
+                    <h4>Social</h4>
+                    <a href="#" class="fa fa-fw fa-facebook"></a>
+                    <a href="#" class="fa fa-fw fa-twitter"></a>
+                    <a href="#" class="fa fa-fw fa-linkedin"></a>
+                    <a href="#" class="fa fa-fw fa-google-plus"></a>
+                </div>
+            </article>
         </div>
-      </div>
-    <?php
-      }
-    }
-    ?>
-  </div>
-</div>
+        <?php
+            }
+        }
+        ?>
+    </div>
+</section>
 
 <?php include "footer.php"; ?>
 
 <!-- JS -->
-<script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
 <script src="js/bootstrap.bundle.min.js"></script>
+<script src="/static/js/material-cards.js"></script>
 
 <script>
-document.addEventListener('DOMContentLoaded', function(){
+$(function() {
+    $('.material-card > .mc-btn-action').click(function () {
+        var card = $(this).parent('.material-card');
+        var icon = $(this).children('i');
+        icon.addClass('fa-spin-fast');
 
-  // --- Initialisation Swiper ---
-  document.querySelectorAll('.event-swiper').forEach(swiperEl => {
-    new Swiper(swiperEl, {
-      loop: true,
-      autoplay: { delay: 3500, disableOnInteraction: false },
-      pagination: { el: swiperEl.querySelector('.swiper-pagination'), clickable: true },
-      effect: 'slide',
-      grabCursor: true,
+        if (card.hasClass('mc-active')) {
+            card.removeClass('mc-active');
+            window.setTimeout(function() {
+                icon.removeClass('fa-arrow-left fa-spin-fast').addClass('fa-bars');
+            }, 800);
+        } else {
+            card.addClass('mc-active');
+            window.setTimeout(function() {
+                icon.removeClass('fa-bars fa-spin-fast').addClass('fa-arrow-left');
+            }, 800);
+        }
     });
-  });
+});
 
-  // --- Filtres JS ---
+// --- Filtres JS ---
+document.addEventListener('DOMContentLoaded', function(){
   const keywordInput = document.getElementById('filter-keyword');
   const tagSelect = document.getElementById('filter-tags');
   const priceInput = document.getElementById('filter-max-price');
   const favoriteCheckbox = document.getElementById('filter-favorites');
   const resetBtn = document.getElementById('filter-reset');
-  const activityCards = document.querySelectorAll('.activity-card');
+  const activityCards = document.querySelectorAll('.material-card');
 
   function filterActivities() {
     const keyword = keywordInput.value.trim().toLowerCase();
@@ -181,25 +181,17 @@ document.addEventListener('DOMContentLoaded', function(){
     const favoritesOnly = favoriteCheckbox.checked;
 
     activityCards.forEach(card => {
-      const name = card.dataset.name;
-      const price = parseFloat(card.dataset.price);
-      const tags = card.dataset.tags;
-      const isFavorite = card.dataset.favorite === "1";
+      const name = card.querySelector('h2 span').textContent.toLowerCase();
+      const price = parseFloat(card.querySelector('h2 strong').textContent.replace(/[^0-9,]/g,'').replace(',','.'));
       let visible = true;
-
       if(keyword && !name.includes(keyword)) visible = false;
-      if(selectedTag && (!tags || !tags.split(',').map(t => t.trim()).includes(selectedTag))) visible = false;
       if(!isNaN(maxPrice) && price > maxPrice) visible = false;
-      if(favoritesOnly && !isFavorite) visible = false;
-
       card.style.display = visible ? 'block' : 'none';
     });
   }
 
   keywordInput.addEventListener('input', filterActivities);
-  tagSelect.addEventListener('change', filterActivities);
   priceInput.addEventListener('input', filterActivities);
-  favoriteCheckbox.addEventListener('change', filterActivities);
   resetBtn.addEventListener('click', () => {
     keywordInput.value = '';
     tagSelect.value = '';
@@ -207,8 +199,8 @@ document.addEventListener('DOMContentLoaded', function(){
     favoriteCheckbox.checked = false;
     filterActivities();
   });
-
 });
 </script>
+
 </body>
 </html>

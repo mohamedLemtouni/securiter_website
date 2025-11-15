@@ -58,7 +58,7 @@
 										<div class="section text-center">
 											<h4 class="mb-3 pb-3">Inscription</h4>
 											<!-- Sign Up Form -->
-											<form action="traitementconn.php?value=inscription" method="post">
+											<form action="traitementconn.php?value=inscription" method="post" enctype="multipart/form-data">
 												<div class="form-group" style="display: flex;">
 													
 													<input type="text" id="nom" class="form-style" name="nom"
