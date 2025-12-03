@@ -2,7 +2,6 @@
 session_start();
 include("db.php");
 
-// 🔒 Vérifier la connexion utilisateur
 if (!isset($_SESSION["idcli"])) {
     echo "<script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
           <script>
@@ -20,7 +19,6 @@ if (!isset($_SESSION["idcli"])) {
 
 $idcli = $_SESSION["idcli"];
 
-// 🔍 Récupérer les infos du client
 $cmd = $db->prepare("SELECT * FROM CLIENT WHERE ID_CLIENT = :id");
 $cmd->execute([":id" => $idcli]);
 $client = $cmd->fetch(PDO::FETCH_ASSOC);

@@ -8,6 +8,21 @@ DROP TABLE IF EXISTS ACTIVITE_EVENEMENT;
 DROP TABLE IF EXISTS CLIENT;
 DROP TABLE IF EXISTS FAVORIS;
 
+-- Dans votre fichier ./mysql/init.sql
+-- (À ajouter avant le CREATE TABLE)
+
+-- 1. Créer l'utilisateur d'application s'il n'existe pas
+CREATE USER IF NOT EXISTS 'appuser'@'%' IDENTIFIED BY 'monmdp';
+
+-- 2. Donner tous les privilèges sur la base de données 'travel_db'
+GRANT ALL PRIVILEGES ON travel_db.* TO 'appuser'@'%';
+
+-- 3. Appliquer les changements
+FLUSH PRIVILEGES;
+
+-- 4. Créer les tables (CREATE TABLE CLIENT...)
+-- ...
+
 CREATE TABLE CLIENT (
     ID_CLIENT INT AUTO_INCREMENT PRIMARY KEY,
     NOM_CLI VARCHAR(100) NOT NULL,

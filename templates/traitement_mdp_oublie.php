@@ -68,14 +68,11 @@ switch ($value) {
         if (!$client) {
             afficherMessage("Ce mail n'est pas inscrit.", "connexion.php", "error");
         }
-
-        // Génération du code et stockage
         generateRandomCode();
         $_SESSION["mail"] = $mail;
-
-        // En local : afficher le code à l’écran
         $code = $_SESSION['code'];
-        afficherMessage("Code de vérification : $code", "motdepasseoublier.php?code_fourni_mail=true&mailrec=" . urlencode($mail), "info");
+        $redirectUrl = "motdepasseoublier.php?code_fourni_mail=true&mailrec=" . urlencode($mail);
+        afficherMessage("Code de vérification : $code", $redirectUrl, "info");
         break;
 
     case "code_fourni_mail":
@@ -117,7 +114,6 @@ switch ($value) {
                 ":pwd" => $hashedPassword,
                 ":id" => $idcli["ID_CLIENT"]
             ]);
-
             unset($_SESSION["mail"]);
             afficherMessage("Mot de passe changé avec succès !", "connexion.php", "success");
         } catch (Exception $e) {

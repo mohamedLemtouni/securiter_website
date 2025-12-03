@@ -26,13 +26,11 @@
 						<input class="checkbox" type="checkbox" id="reg-log" name="reg-log" />
 						<label for="reg-log"></label>
 						<div class="card-3d-wrap mx-auto">
-
 							<div style="height: 500px; width: 470px;" class="card-3d-wrapper">
 								<div class="card-front" id="connexion">
 									<div class="center-wrap">
 										<div class="section text-center">
 											<h4 class="mb-4 pb-3">Connexion</h4>
-											<!-- Log In Form -->
 											<form action="traitementconn.php?value=conn" method="post">
 												<div class="form-group">
 													<input type="email" id="email" class="form-style" name="email"
@@ -46,7 +44,6 @@
 												</div>
 												<button type="submit" class="btn mt-4">Se connecter</button>
 											</form>
-											<!-- End of Log In Form -->
 											<p class="mb-0 mt-4 text-center"><a href="motdepasseoublier.php"
 													class="link">Mot de passe
 													oublié ?</a></p>
@@ -57,10 +54,8 @@
 									<div class="center-wrap">
 										<div class="section text-center">
 											<h4 class="mb-3 pb-3">Inscription</h4>
-											<!-- Sign Up Form -->
 											<form action="traitementconn.php?value=inscription" method="post" enctype="multipart/form-data">
 												<div class="form-group" style="display: flex;">
-													
 													<input type="text" id="nom" class="form-style" name="nom"
 														style="margin-right: 5px;" placeholder="Nom" required>
 													<i class="input-icon uil uil-user"></i>
@@ -91,12 +86,9 @@
 
 														}
 													}
-
 													const numtelInput = document.getElementById('numtel');
 													numtelInput.addEventListener('input', formattageNumTel);
 												</script>
-
-
 												<div class="form-group mt-2">
 													<input type="email" id="email" class="form-style" name="email"
 														placeholder="E-mail" required>
@@ -118,7 +110,6 @@
 												</div>
 												<button type="submit" class="btn mt-4">S'enregistrer</button>
 											</form>
-											<!-- End of Sign Up Form -->
 										</div>
 									</div>
 								</div>

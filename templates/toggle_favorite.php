@@ -2,12 +2,10 @@
 session_start();
 include "db.php";
 
-// Définir le type de contenu JSON
 header('Content-Type: application/json');
 
 $response = ['success' => false, 'message' => ''];
 
-// 1️⃣ Vérification de la connexion
 if (!isset($_SESSION['idcli'])) {
     http_response_code(401);
     $response['message'] = 'Veuillez vous connecter pour gérer vos favoris.';
@@ -17,7 +15,6 @@ if (!isset($_SESSION['idcli'])) {
 
 $client_id = $_SESSION['idcli'];
 
-// 2️⃣ Vérification des données POST
 $event_id = isset($_POST['eventId']) ? (int)$_POST['eventId'] : 0;
 $action = $_POST['action'] ?? '';
 
@@ -28,10 +25,8 @@ if (!$event_id || !in_array($action, ['add', 'remove'])) {
     exit;
 }
 
-// 3️⃣ Exécution selon l'action
 try {
     if ($action === 'add') {
-        // Ajouter aux favoris (ignorer si déjà présent)
         $stmt = $db->prepare("INSERT INTO FAVORIS (ID_CLIENT, ID_ACT_EV) VALUES (?, ?) 
                               ON DUPLICATE KEY UPDATE ID_CLIENT = ID_CLIENT");
         if ($stmt->execute([$client_id, $event_id])) {
@@ -40,7 +35,7 @@ try {
         } else {
             $response['message'] = 'Impossible d\'ajouter aux favoris.';
         }
-    } else { // remove
+    } else { 
         $stmt = $db->prepare("DELETE FROM FAVORIS WHERE ID_CLIENT = ? AND ID_ACT_EV = ?");
         if ($stmt->execute([$client_id, $event_id])) {
             $response['success'] = true;
@@ -55,5 +50,4 @@ try {
     error_log("Erreur FAVORIS DB: " . $e->getMessage());
 }
 
-// 4️⃣ Retour JSON
 echo json_encode($response);

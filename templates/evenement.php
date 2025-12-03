@@ -2,7 +2,7 @@
 session_start();  
 include "db.php";  
 
-// Récupérer les favoris de l'utilisateur connecté
+
 $favoritesIds = [];
 if (isset($_SESSION['idcli'])) {
     $favStmt = $db->prepare("SELECT ID_ACT_EV FROM FAVORIS WHERE ID_CLIENT = ?");
@@ -10,7 +10,6 @@ if (isset($_SESSION['idcli'])) {
     $favoritesIds = $favStmt->fetchAll(PDO::FETCH_COLUMN);
 }
 
-// Récupération des tags distincts
 $tagsStmt = $db->query("SELECT DISTINCT TAGS FROM ACTIVITE_EVENEMENT WHERE TAGS IS NOT NULL AND TAGS <> ''");
 $allTags = [];
 while($row = $tagsStmt->fetch(PDO::FETCH_ASSOC)) {
@@ -21,7 +20,7 @@ while($row = $tagsStmt->fetch(PDO::FETCH_ASSOC)) {
         }
     }
 }
-sort($allTags); // Tri alphabétique
+sort($allTags); 
 ?>  
 
 <!DOCTYPE html>
@@ -30,18 +29,15 @@ sort($allTags); // Tri alphabétique
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Nos Événements</title>
-
-  <!-- CSS -->
+ 
   <link rel="stylesheet" href="/static/css/bootstrap.min.css">
   <link rel="stylesheet" href="fontawesome/css/all.min.css">
-  <link rel="stylesheet" href="/static/css/templatemo-style.css">
+  <link rel="stylesheet" href="/static/css/templatemo-style.css"> 
   <link rel="stylesheet" href="/static/css/event.css">   
-  <link rel="stylesheet" href="/static/css/header.css">  
+
   <link rel="stylesheet" href="/static/css/card.css">
-
-  <!-- Material Cards CSS -->
   <link rel="stylesheet" href="/static/css/material-cards.css">
-
+  <link rel="stylesheet" href="/static/css/header.css"> 
   <style>
 
     .filters-container {
@@ -57,14 +53,12 @@ sort($allTags); // Tri alphabétique
     }
   </style>
 
-  <!-- jQuery -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 
 <body>
 <?php include "header.php"; ?>
 
-<!-- Filtres -->
 <div class="filters-container" style="margin-top: 7%;">
   <input type="text" id="filter-keyword" placeholder="Rechercher par mot-clé..." />
   <select id="filter-tags">
@@ -80,7 +74,6 @@ sort($allTags); // Tri alphabétique
   <button id="filter-reset">Réinitialiser</button>
 </div>
 
-<!-- Grille Material Cards -->
 <section class="container">
     <div class="row active-with-click">
         <?php
@@ -140,7 +133,6 @@ sort($allTags); // Tri alphabétique
 
 <?php include "footer.php"; ?>
 
-<!-- JS -->
 <script src="js/bootstrap.bundle.min.js"></script>
 <script src="/static/js/material-cards.js"></script>
 
@@ -165,7 +157,6 @@ $(function() {
     });
 });
 
-// --- Filtres JS ---
 document.addEventListener('DOMContentLoaded', function(){
   const keywordInput = document.getElementById('filter-keyword');
   const tagSelect = document.getElementById('filter-tags');

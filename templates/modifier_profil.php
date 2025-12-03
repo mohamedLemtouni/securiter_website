@@ -1,8 +1,6 @@
 <?php
 session_start();
 include("db.php");
-
-// 🔒 Vérifier la connexion utilisateur
 if (!isset($_SESSION["idcli"])) {
     echo "<script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
           <script>
@@ -20,7 +18,6 @@ if (!isset($_SESSION["idcli"])) {
 
 $idcli = $_SESSION["idcli"];
 
-// 🔍 Récupérer les infos du client
 $cmd = $db->prepare("SELECT * FROM CLIENT WHERE ID_CLIENT = :id");
 $cmd->execute([":id" => $idcli]);
 $client = $cmd->fetch(PDO::FETCH_ASSOC);
@@ -40,7 +37,6 @@ if (!$client) {
     exit();
 }
 
-// 💡 Valeurs sécurisées avec fallback
 $photo = !empty($client['PHOTO_PROFILE']) ? $client['PHOTO_PROFILE'] : './photos/profilpic/profiledefault.jpg';
 $prenom = htmlspecialchars($client['PRENOM_CLI']);
 $nom = htmlspecialchars($client['NOM_CLI']);
@@ -58,7 +54,7 @@ $tel = htmlspecialchars($client['TEL_CLI'] ?: '');
     <style>
         body {
             font-family: 'Poppins', sans-serif;
-            background: #f0f4f8; /* fond clair */
+            background: #f0f4f8; 
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -78,7 +74,7 @@ $tel = htmlspecialchars($client['TEL_CLI'] ?: '');
         .edit-container h2 {
             text-align: center;
             margin-bottom: 30px;
-            color: #1A3D7C; /* bleu azure foncé */
+            color: #1A3D7C; 
         }
 
         .profile-img {
@@ -86,7 +82,7 @@ $tel = htmlspecialchars($client['TEL_CLI'] ?: '');
             height: 110px;
             border-radius: 50%;
             object-fit: cover;
-            border: 2px solid #1A3D7C; /* accent bleu */
+            border: 2px solid #1A3D7C;
             display: block;
             margin: 0 auto 20px auto;
         }

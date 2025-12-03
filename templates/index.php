@@ -24,7 +24,6 @@ include("db.php"); ?>
       line-height: 1.6;
     }
 
-    /* Hero Section */
     .hero {
       height: 100vh;
       display: flex;
@@ -53,8 +52,6 @@ include("db.php"); ?>
       background-color: #0056b3;
       transform: translateY(-3px);
     }
-
-    /* Tours Section */
     .tours {
       padding: 5rem 2rem;
       background-color: rgba(0,0,0,0.85);
@@ -83,8 +80,6 @@ include("db.php"); ?>
       font-size: 1.3rem;
       font-weight: 500;
     }
-
-    /* Video Section */
     .video-section {
       padding: 5rem 2rem;
       background-color: rgba(0,0,0,0.9);
@@ -104,8 +99,6 @@ include("db.php"); ?>
       transform: scale(1.05);
       box-shadow: 0 0 15px rgba(0,123,255,0.7);
     }
-
-    /* Responsive adjustments */
     @media (max-width: 768px) {
       .hero h1 {
         font-size: 2.5rem;
@@ -122,13 +115,10 @@ include("db.php"); ?>
 
 <?php include("header.php"); ?>
 <body>
-  <!-- Hero -->
   <section class="hero d-flex flex-column justify-content-center align-items-center text-center">
     <h1>Want to visit Morocco?</h1>
     <a href="#tours" class="btn btn-primary btn-lg mt-3">Give it a try →</a>
   </section>
-
-  <!-- Tours Section -->
   <section id="tours" class="tours container">
     <h2>Best destinations</h2>
     <div class="row g-4">
@@ -158,8 +148,6 @@ include("db.php"); ?>
       </div>
     </div>
   </section>
-
-  <!-- Video Section -->
   <section class="video-section container">
     <h2>Latest photos from our visitors</h2>
     <div class="row g-4 video-thumbnails">
@@ -176,8 +164,6 @@ include("db.php"); ?>
   </section>
 
 <?php include("footer.php"); ?>
-
-<!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

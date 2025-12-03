@@ -86,15 +86,12 @@ switch ($value) {
         $password = $_POST["password"];
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
-        // Vérifier si l'email existe déjà
         $cmd = $db->prepare("SELECT 1 FROM CLIENT WHERE EMAIL_CLI = :mail");
         $cmd->execute([":mail" => $email]);
         if ($cmd->fetch()) {
             afficherMessage("Vous êtes déjà inscrit !", "connexion.php", "info");
         }
-
-        // Gestion de la photo de profil
-        $photoProfil = null; // par défaut on ne met rien
+        $photoProfil = null; 
         if (isset($_FILES['profilpic']) && $_FILES['profilpic']['error'] === UPLOAD_ERR_OK) {
             $fileTmpPath = $_FILES['profilpic']['tmp_name'];
             $fileName = $_FILES['profilpic']['name'];
@@ -106,7 +103,6 @@ switch ($value) {
                 $newFileName = md5(time() . $fileName) . '.' . $fileExtension;
                 $uploadFileDir = './photos/profilpic/';
                 $dest_path = $uploadFileDir . $newFileName;
-
                 if (move_uploaded_file($fileTmpPath, $dest_path)) {
                     $photoProfil = $dest_path;
                 } else {
@@ -116,8 +112,6 @@ switch ($value) {
                 afficherMessage("Type de fichier non autorisé. JPG, JPEG, PNG, GIF uniquement.", "connexion.php", "error");
             }
         }
-
-        // Insertion dans la base
         if ($photoProfil) {
             $insert = $db->prepare("INSERT INTO CLIENT (NOM_CLI, PRENOM_CLI, EMAIL_CLI, TEL_CLI, MDP_CLI, PHOTO_PROFILE)
                                     VALUES (:nom, :prenom, :mail, :tel, :pwd, :photo)");
@@ -130,7 +124,6 @@ switch ($value) {
                 ":photo" => $photoProfil,
             ]);
         } else {
-            // On n'inclut pas PHOTO_PROFILE, la base prendra la valeur par défaut
             $insert = $db->prepare("INSERT INTO CLIENT (NOM_CLI, PRENOM_CLI, EMAIL_CLI, TEL_CLI, MDP_CLI)
                                     VALUES (:nom, :prenom, :mail, :tel, :pwd)");
             $insert->execute([

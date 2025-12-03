@@ -2,13 +2,11 @@
 session_start();
 include 'db.php';
 
-// Vérification de l'ID d'événement
 if (!isset($_GET['val']) || !is_numeric($_GET['val'])) {
     die("<h2>ID d'événement invalide.</h2>");
 }
 $id = intval($_GET['val']);
 
-// Vérification de la visibilité de l'événement
 $test_val = $db->prepare("SELECT VISIBLE FROM ACTIVITE_EVENEMENT WHERE ID_ACT_EV = ?");
 $test_val->execute([$id]);
 $cmd_tst_val = $test_val->fetch(PDO::FETCH_ASSOC);
@@ -16,7 +14,6 @@ if (!$cmd_tst_val["VISIBLE"]) {
     die("<h2>ID d'événement invalide.</h2>");
 }
 
-// Récupération des infos de l'événement et organisateur
 $sql = "SELECT AE.*, C.NOM_CLI, C.PRENOM_CLI, C.PHOTO_PROFILE, C.EMAIL_CLI
         FROM ACTIVITE_EVENEMENT AE
         JOIN CLIENT C ON AE.ID_CLIENT_ORGANISATEUR = C.ID_CLIENT
@@ -28,13 +25,11 @@ if (!$event) {
     die("<h2>Événement introuvable.</h2>");
 }
 
-// Récupération des images
 $sqlImg = "SELECT URL_IMAGE FROM IMAGE_ACTIVITE WHERE ID_ACT_EV = ?";
 $stmtImg = $db->prepare($sqlImg);
 $stmtImg->execute([$id]);
 $images = $stmtImg->fetchAll(PDO::FETCH_COLUMN);
 
-// Vérification si l'événement est déjà en favoris
 $favori = false;
 if(isset($_SESSION['idcli'])) {
     $checkFav = $db->prepare("SELECT 1 FROM FAVORIS WHERE ID_CLIENT = ? AND ID_ACT_EV = ?");
@@ -49,10 +44,12 @@ if(isset($_SESSION['idcli'])) {
     <title><?= htmlspecialchars($event['NOM']) ?> - Détails</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="/static/css/header.css">
+    <link rel="stylesheet" href="/static/css/header.css"> 
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/templatemo-style.css">
     <link rel="stylesheet" href="/static/css/footer.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
-    <link rel="stylesheet" href="/fontawesome/css/all.min.css">
+    <link rel="stylesheet" href="fontawesome/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
@@ -61,7 +58,6 @@ if(isset($_SESSION['idcli'])) {
 <body class="bg-gray-50 text-gray-800">
 <div class="max-w-5xl mx-auto mt-10 p-6 bg-white rounded-2xl shadow-lg mb-8">
 
-    <!-- Titre et cœur favori -->
     <div class="flex items-center gap-2">
         <h1 class="text-3xl font-bold text-gray-900 mb-4"><?= htmlspecialchars($event['NOM']) ?></h1>
         <i 
@@ -70,8 +66,6 @@ if(isset($_SESSION['idcli'])) {
             onclick="toggleFavoris(<?= $event['ID_ACT_EV'] ?>)" style="margin: 0% 0% 1% 1%;">
         </i>
     </div>
-
-    <!-- Slider images -->
     <?php if ($images): ?>
         <div class="swiper mySwiper mb-6 rounded-2xl overflow-hidden">
             <div class="swiper-wrapper">
@@ -89,7 +83,6 @@ if(isset($_SESSION['idcli'])) {
         <p class="text-gray-500 italic mb-6">Aucune image disponible pour cet événement.</p>
     <?php endif; ?>
 
-    <!-- Informations et organisateur -->
     <div class="grid md:grid-cols-2 gap-6">
         <div>
             <h2 class="text-xl font-semibold mb-2">🗓️ Informations</h2>
@@ -114,7 +107,6 @@ if(isset($_SESSION['idcli'])) {
                     </div>
                 </div>
 
-                <!-- Formulaire de participation -->
                 <div class="mt-8 bg-gray-100 p-6 rounded-xl shadow-inner w-full">
                     <form action="participation.php" method="POST" class="space-y-4">
                         <input type="hidden" name="id_event" value="<?= $event['ID_ACT_EV'] ?>">
@@ -142,13 +134,11 @@ if(isset($_SESSION['idcli'])) {
         </div>
     </div>
 
-    <!-- Description complète -->
     <div class="mt-8">
         <h2 class="text-xl font-semibold mb-2">📖 Description complète</h2>
         <p class="text-gray-700 leading-relaxed"><?= nl2br(htmlspecialchars($event['DESCRIPTION_CMPLT'])) ?></p>
     </div>
 
-    <!-- Tags -->
     <?php if ($event['TAGS']): ?>
         <div class="mt-6">
             <h3 class="font-semibold mb-1">🏷️ Tags :</h3>
@@ -159,8 +149,6 @@ if(isset($_SESSION['idcli'])) {
     <?php endif; ?>
 
 </div>
-
-<!-- SwiperJS init -->
 <script>
     const swiper = new Swiper(".mySwiper", {
         loop: true,
@@ -170,7 +158,6 @@ if(isset($_SESSION['idcli'])) {
     });
 </script>
 
-<!-- SweetAlert + toggle favoris -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 function toggleFavoris(eventId) {

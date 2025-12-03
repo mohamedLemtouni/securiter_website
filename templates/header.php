@@ -1,47 +1,19 @@
-<style>
-    li.nav-item {
-        margin-right: 30px;
-    }
-
-    .header-profile-img {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        object-fit: cover;
-        border: 2px solid #fff;
-        margin-left: 8px;
-    }
-
-    /* Pour que le menu reste centré et ne soit pas déplacé par les boutons utilisateur */
-    .navbar-nav-center {
-        position: absolute;
-        left: 50%;
-        transform: translateX(-50%);
-    }
-</style>
 
 <header class="navbar navbar-expand-lg navbar-dark fixed-top shadow-sm" style="background-color: #0a2a66;">
   <div class="container position-relative">
-    <!-- Logo -->
     <a class="navbar-brand" href="index.php">
-      <img src="./photos/logo_bw.png" alt="Logo" height="50" class="d-inline-block align-text-top">
+      <img src="./photos/logo_bw.png" alt="Logo" class="d-inline-block align-text-top">
     </a>
-
-    <!-- Hamburger menu responsive -->
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
       <span class="navbar-toggler-icon"></span>
     </button>
-
-    <!-- Navigation links -->
-    <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
+      <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
       <ul class="navbar-nav navbar-nav-center mb-2 mb-lg-0">
         <li class="nav-item"><a class="nav-link text-white" href="index.php">Home</a></li>
         <li class="nav-item"><a class="nav-link text-white" href="activiter.php">Activities</a></li>
         <li class="nav-item"><a class="nav-link text-white" href="evenement.php">Events</a></li>
       </ul>
     </div>
-
-    <!-- User actions -->
     <div class="d-flex align-items-center gap-2 ms-auto">
       <?php if (!isset($_SESSION["idcli"])): ?>
         <a href="connexion.php" class="btn" style="background-color: #007FFF; color: #fff;">Login</a>

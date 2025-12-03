@@ -1,6 +1,22 @@
 <?php 
 session_start();
 include "db.php";
+// Si pas connecté → retour page précédente ou index
+if(!isset($_SESSION["idcli"])) {
+    $fallback = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : "index.php";
+    header("Location: $fallback");
+    exit;
+}
+// Vérification du statut
+$cmd = $db->prepare("SELECT STATUT_CLI FROM CLIENT WHERE ID_CLIENT = ?");
+$cmd->execute([$_SESSION["idcli"]]);
+$user = $cmd->fetch(PDO::FETCH_ASSOC);
+// Si l'utilisateur n'est pas admin → retour page précédente
+if (!$user || $user["STATUT_CLI"] != "admin") {
+    $fallback = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : "index.php";
+    header("Location: $fallback");
+    exit;
+}
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -9,11 +25,8 @@ include "db.php";
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Panneau d'administration</title>
 <style>
-/* ====== RESET ====== */
 * { margin:0; padding:0; box-sizing:border-box; font-family:"Poppins", sans-serif; }
 body { display:flex; min-height:100vh; background:#f5f6fa; }
-
-/* ====== SIDEBAR ====== */
 .sidebar {
     width:250px; background:#1e1e2d; color:#fff;
     display:flex; flex-direction:column; padding:20px;
@@ -22,35 +35,29 @@ body { display:flex; min-height:100vh; background:#f5f6fa; }
 .sidebar a { text-decoration:none; color:#c0c0c0; padding:12px 15px; border-radius:10px; transition:.3s; display:block; cursor:pointer;}
 .sidebar a:hover, .sidebar a.active { background:#3b3b54; color:#fff; }
 
-/* ====== MAIN CONTENT ====== */
 .main-content { flex:1; padding:20px; }
 
-/* ====== HEADER ====== */
 .header { background:#fff; padding:15px 25px; border-radius:12px; box-shadow:0 3px 10px rgba(0,0,0,0.05); margin-bottom:20px; display:flex; justify-content:space-between; align-items:center;}
 .header h1 { font-size:1.5em; color:#333; }
 .header button { background:#1e1e2d; color:white; border:none; padding:10px 18px; border-radius:8px; cursor:pointer; transition:.3s; }
 .header button:hover { background:#3b3b54; }
 
-/* ====== CARDS ====== */
 .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:20px; margin-bottom:30px;}
 .card { background:#fff; padding:20px; border-radius:15px; box-shadow:0 3px 8px rgba(0,0,0,0.05); }
 .card h3 { font-size:1.1em; color:#555; }
 .card p { font-size:2em; margin-top:10px; color:#1e1e2d; }
 
-/* ====== TABLE ====== */
 .table-section { background:#fff; padding:20px; border-radius:15px; box-shadow:0 3px 8px rgba(0,0,0,0.05); margin-bottom:30px; }
 table { width:100%; border-collapse:collapse; }
 th, td { text-align:left; padding:12px; border-bottom:1px solid #eee; }
 th { background:#f9f9f9; }
 tr:hover { background:#f5f5f5; }
 
-/* ====== BUTTONS ====== */
 .edit-btn { background:#1e1e2d; color:#fff; padding:6px 12px; border-radius:6px; text-decoration:none; font-size:0.85em; transition:.3s; cursor:pointer; }
 .edit-btn:hover { background:#3b3b54; }
 .edit-btn.delete { background:#b32d2e; }
 .edit-btn.delete:hover { background:#d94546; }
 
-/* ====== TABS ====== */
 .tab { display:none; }
 .tab.active { display:block; }
 
@@ -60,7 +67,6 @@ form button:hover { background:#3b3b54; }
 
 @media(max-width:768px){.sidebar{display:none;}.main-content{padding:10px;}}
 
-/* ====== IMAGES ACTIVITÉ ====== */
 .activity-images {
     display: flex;
     flex-wrap: wrap;
@@ -82,7 +88,6 @@ form button:hover { background:#3b3b54; }
     transform: scale(1.05);
 }
 
-
 </style>
 </head>
 <body>
@@ -96,7 +101,6 @@ form button:hover { background:#3b3b54; }
 </div>
 
 <div class="main-content">
-
     <div class="header">
         <h1>Panneau d'administration</h1>
     </div>

@@ -16,7 +16,12 @@
 header {
     font-family: 'Poppins', sans-serif !important;
     background-color: black !important;
-    z-index: 1030; /* Pour Bootstrap fixed-top */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+header img {
+    height: 50px;
 }
 
 /* Navbar links */

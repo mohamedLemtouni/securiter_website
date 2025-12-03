@@ -1,8 +1,6 @@
 <?php
 session_start();
 include("db.php");
-
-
 if (!isset($_SESSION["idcli"])) {
     $redirect = 'connexion.php';
     echo '<!DOCTYPE html><html><head>
@@ -21,9 +19,7 @@ if (!isset($_SESSION["idcli"])) {
           </body></html>';
     exit();
 }
-
 $idcli = $_SESSION["idcli"];
-
 
 $cmd = $db->prepare("SELECT * FROM CLIENT WHERE ID_CLIENT = :id");
 $cmd->execute([":id" => $idcli]);
@@ -53,7 +49,6 @@ $nom    = trim($_POST['nom'] ?? '');
 $email  = trim($_POST['email'] ?? '');
 $tel    = trim($_POST['tel'] ?? '');
 
-// Validation minimale
 if (empty($prenom) || empty($nom) || empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
     $redirect = 'modifier_profil.php';
     echo '<!DOCTYPE html><html><head>
@@ -84,7 +79,6 @@ if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
     if (in_array($fileExt, $allowed)) {
         $newFileName = './photos/profilpic/' . uniqid('profil_', true) . '.' . $fileExt;
         if (move_uploaded_file($fileTmp, $newFileName)) {
-            // Supprimer ancienne photo si ce n'est pas la photo par défaut
             if ($photo !== $defaultPhoto && file_exists($photo)) {
                 @unlink($photo);
             }
